@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //012
 //345
@@ -56,7 +57,6 @@ void list_add_element(list * l,char * element)
   }
 
   while(n->next!=NULL){
-    printf("skipping ... %s\n",n->data);
     n=n->next;
   }
  
@@ -134,38 +134,56 @@ void slide_dump(char * position)
 
 }
 
+/**
+ * Generates a list containing the list of successors
+ * from the passed position
+ */
+
+list * slide_successors(char * position)
+{
+
+    list * l = (list*)malloc(sizeof(list));
+    list_init(l);
+
+    //find the position of 0 
+    int i,index = 0;
+    while(position[index]!='0'){
+        index++;
+    }
+
+    //index a la position 
+    int cnt = possible_moves[index][0];
+    printf("CNT : %d\n",cnt);
+    for(i = 1;i<=cnt;i++){
+        printf("MOVE %d\n",possible_moves[index][i]);
+        int spot = possible_moves[index][i];
+        char * new_position = strdup(position);
+        //je swappe la position vide avec le spot
+        new_position[index] = new_position[spot];
+        new_position[spot] = '0'; 
+        list_add_element(l,new_position);
+        slide_dump(new_position);
+    }
+
+    return l;
+}
+
+void slide_search(){
+
+}
+
 int main ()
 {
   list *l=(list*)malloc(sizeof(list));
   
   
   list_init(l);
-  list_add_element(l,"Hello");
-  list_add_element(l,"wold");
-  list_add_element(l,"!");
-  list_dump(l);
-  list_remove_last(l);
-  list_dump(l);
-  list_remove_last(l);
-  list_dump(l);
-  list_remove_last(l);
-  list_dump(l);
-  list_remove_last(l);
-  list_dump(l);
-  list_add_element(l,"ALL");
-  list_add_element(l,"YOUR");
-  list_add_element(l,"BASES!");
-  list_dump(l);
-  list_remove_first(l);
-  list_dump(l);
-  list_remove_first(l);
-  list_dump(l);
-  list_remove_first(l);
-  list_dump(l);
-  list_remove_first(l);
-  list_dump(l);
   
-  slide_dump("012345678");
+  slide_successors("102345678");
+  slide_successors("142305678");
+  slide_successors("201354678");
+
+
   return 0;
 }
  
