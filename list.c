@@ -172,9 +172,36 @@ list * slide_successors(char * position)
     return l;
 }
 
+int list_contains(list * l, char * elem){
+
+    int ret = 0; 
+    struct _node * n = l->head;
+
+    while(n!=NULL){
+        if(strcmp(elem,n->data)==0)
+            return 1;
+        n=n->next;
+    }
+    return ret;
+}
+
 void slide_search(list * openset, list *closedset, char * goal){
 
-    
+   //Generic search :
+   //pop last element and add the successors
+   struct _node * candidate = list_remove_last(openset);
+   if(0==strcmp(goal,candidate->data)){
+       //We found a goal !
+       //return the complete path to get there !
+       printf("REACHED GOAL\n");
+       return;
+   }
+
+   
+   list_add_element(closedset,candidate->data);
+
+   list * l = slide_successors(candidate->data);
+
 
 
 }
@@ -189,11 +216,14 @@ int main ()
   list_init(openset);
   list_init(closedset);
 
-  list_add_element(openset,"Hello");
-  list_add_element(openset,"Again");
+  list_add_element(openset,"hello");
+  list_add_element(openset,"world");
+  list_add_element(openset,"again");
 
-  printf("%s\n",list_remove_last(openset)->data);
-  printf("%s\n",list_remove_last(openset)->data);
+  printf("contains hello : %d\n",list_contains(openset,"hello"));
+  printf("contains again : %d\n",list_contains(openset,"again"));
+  printf("contains GOGO : %d\n",list_contains(openset,"GOGO"));
+
 
 
 
