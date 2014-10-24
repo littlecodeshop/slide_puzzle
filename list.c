@@ -69,23 +69,27 @@ void list_add_element(list * l,char * element)
  * 
  */
 
-void list_remove_last(list * l)
+struct _node * list_remove_last(list * l)
 {
 
     struct _node ** address_ptr = &(l->head);
     struct _node ** address_previous = NULL;
 
+    struct _node * ret= NULL;
+
     while((*address_ptr)!=NULL){
-        printf("SKIPPING %s\n",(*address_ptr)->data);
         address_previous = address_ptr;
         address_ptr = &((*address_ptr)->next);
-        printf("ADDRESS : %ld\n",address_ptr);
     }
 
     if(address_previous!=NULL){
-        free(*address_previous);
+
+        //free(*address_previous);
+        ret = *address_previous;
         *address_previous = NULL;
     }
+
+    return ret;
 }
 
 
@@ -168,22 +172,36 @@ list * slide_successors(char * position)
     return l;
 }
 
-void slide_search(){
+void slide_search(list * openset, list *closedset, char * goal){
+
+    
+
 
 }
 
 int main ()
 {
-  list *l=(list*)malloc(sizeof(list));
+
+  list *openset=(list*)malloc(sizeof(list));
+  list *closedset=(list*)malloc(sizeof(list));
   
   
-  list_init(l);
-  
-  slide_successors("102345678");
-  slide_successors("142305678");
-  slide_successors("201354678");
+  list_init(openset);
+  list_init(closedset);
+
+  list_add_element(openset,"Hello");
+  list_add_element(openset,"Again");
+
+  printf("%s\n",list_remove_last(openset)->data);
+  printf("%s\n",list_remove_last(openset)->data);
 
 
+
+  list_add_element(openset,"102345678");
+
+  //launch a search 
+  slide_search(openset,closedset,"012345678");
+  
   return 0;
 }
  
