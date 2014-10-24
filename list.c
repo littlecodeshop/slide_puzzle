@@ -45,22 +45,17 @@ void list_init(list * l)
  
 void list_add_element(list * l,char * element)
 {
-  struct _node  *n = l->head;
-  struct _node * new_node = (struct _node*)malloc(sizeof(struct _node));
-  new_node->data = element;
-  new_node->next = NULL;
+    struct _node  *n = (struct _node*)(&(l->head));
+    struct _node * new_node = (struct _node*)malloc(sizeof(struct _node));
+    new_node->data = element;
+    new_node->next = NULL;
 
-  //TODO : avoid this test ??
-  if(l->head == NULL){
-      l->head = new_node;
-      return;
-  }
 
-  while(n->next!=NULL){
-    n=n->next;
-  }
- 
-  n->next = new_node;
+    while(n->next!=NULL){
+        n=n->next;
+    }
+
+    n->next = new_node;
 }
 
 /**
