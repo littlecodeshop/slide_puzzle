@@ -21,21 +21,29 @@ int possible_moves[][9] = {
 }; 
 
 
+/**
+ *
+ * List generique en C
+ *
+ */
+
 struct _node
 {
-    struct _node * next;
-    char * data; 
+    struct _node * next;    //pointeur sur le prochain element
+    void * data;            //pointeur sur l'element 
 };
 
 typedef struct _list
 {
-    struct _node * head;
+    struct _node * head;    //pointer to first element
+    int sz;                 //size of an element in bytes
 } list;
 
-list * list_init()
+list * list_init(int sz)
 {
     list * l = (list *)malloc(sizeof(list));
     l->head = NULL;
+    l->sz = sz;
     return l;
 }
 
@@ -45,11 +53,17 @@ list * list_init()
  * 
  */
 
-void list_add_element(list * l,char * element)
+void list_add_element(list * l,unsigned char * element)
 {
     struct _node  *n = (struct _node*)(&(l->head));
     struct _node * new_node = (struct _node*)malloc(sizeof(struct _node));
-    new_node->data = element;
+    
+    
+    new_node->data = malloc(l->sz); //on doit copier la memoire 
+    //copy the memory from element into data
+    memcpy(new_node->data,element,l->sz);
+
+    
     new_node->next = NULL;
 
 
@@ -113,7 +127,7 @@ void list_remove_first(list * l)
 
 void list_dump(list * l)
 {
-    printf("***** DUMPING ******\n"); 
+    printf("***** DUMPING STRINGS ******\n"); 
     struct _node * n = l->head;
     while(n!=NULL){
         printf("==> %s\n",n->data);
@@ -121,6 +135,16 @@ void list_dump(list * l)
     }
 }
 
+void list_dump_int(list * l)
+{
+    printf("***** DUMPING INTS ******\n"); 
+    struct _node * n = l->head;
+    while(n!=NULL){
+        int dt = 
+        printf("==> %d\n",*((int*)(n->data)));
+        n=n->next;
+    }
+}
 
 void slide_dump(char * position)
 {
@@ -188,8 +212,22 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
 int main ()
 {
 
-    //launch a search 
-    slide_search("120345678","012345678", slide_successors);
+    int a=5;
+    int b=7;
+
+    //make a list of ints
+    list * list_int = list_init(sizeof(int));
+    list * list_str = list_init(sizeof(char*));
+
+    list_add_element(list_int,&a);
+    list_add_element(list_int,&b);
+
+    list_add_element(list_str,"HELLO");
+    list_add_element(list_str,"WORLD");
+
+    list_dump(list_str);
+    list_dump_int(list_int);
+
 
     return 0;
 }
