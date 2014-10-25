@@ -125,12 +125,18 @@ void list_remove_first(list * l)
  * 
  */
 
-void list_dump(list * l)
+char * charstar_format(struct _node * n)
 {
-    printf("***** DUMPING STRINGS ******\n"); 
+    //si c'est une liste de char* on a rien a faire
+    return n->data;
+}
+
+void list_dump(list * l,char * (*format)(struct _node *))
+{
+    printf("***** DUMPING GENERIC ******\n"); 
     struct _node * n = l->head;
     while(n!=NULL){
-        printf("==> %s\n",n->data);
+        printf("==> %s\n",format(n));
         n=n->next;
     }
 }
@@ -212,21 +218,26 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
 int main ()
 {
 
-    int a=5;
-    int b=7;
-
     //make a list of ints
-    list * list_int = list_init(sizeof(int));
-    list * list_str = list_init(sizeof(char*));
+    list *path1 = list_init(sizeof(char*));
+    list *path2 = list_init(sizeof(char*));
 
-    list_add_element(list_int,&a);
-    list_add_element(list_int,&b);
 
-    list_add_element(list_str,"HELLO");
-    list_add_element(list_str,"WORLD");
+    list * paths = list_init(sizeof(list*));
 
-    list_dump(list_str);
-    list_dump_int(list_int);
+    list_add_element(path1,"012345678");
+    list_add_element(path1,"102345678");
+    list_add_element(path1,"120345678");
+
+    list_add_element(path2,"ABCDEFGHI");
+    list_add_element(path2,"BACDEFGHI");
+    list_add_element(path2,"CABDEFGHI");
+    
+    list_add_element(paths,path1);
+    list_add_element(paths,path2);
+
+    list_dump(path1,charstar_format);
+
 
 
     return 0;
