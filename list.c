@@ -9,32 +9,34 @@
 //345
 //678
 int possible_moves[][9] = {
-  {2,1,3},      //0
-  {3,0,2,4},    //1
-  {2,1,5},      //2
-  {3,0,4,6},    //3
-  {4,1,3,5,7},  //4
-  {3,2,4,8},    //5
-  {2,3,7},      //6
-  {3,6,4,8},    //7
-  {2,5,7}       //8
-  }; 
+    {2,1,3},      //0
+    {3,0,2,4},    //1
+    {2,1,5},      //2
+    {3,0,4,6},    //3
+    {4,1,3,5,7},  //4
+    {3,2,4,8},    //5
+    {2,3,7},      //6
+    {3,6,4,8},    //7
+    {2,5,7}       //8
+}; 
 
 
 struct _node
 {
-  struct _node * next;
-  char * data; 
+    struct _node * next;
+    char * data; 
 };
 
 typedef struct _list
 {
-struct _node * head;
+    struct _node * head;
 } list;
 
-void list_init(list * l)
+list * list_init()
 {
-  l->head = NULL;
+    list * l = (list *)malloc(sizeof(list));
+    l->head = NULL;
+    return l;
 }
 
 /**
@@ -42,7 +44,7 @@ void list_init(list * l)
  * Add an element at the end of the list (list must NOT be null)
  * 
  */
- 
+
 void list_add_element(list * l,char * element)
 {
     struct _node  *n = (struct _node*)(&(l->head));
@@ -108,15 +110,15 @@ void list_remove_first(list * l)
  * print the list to help debug
  * 
  */
- 
+
 void list_dump(list * l)
 {
     printf("***** DUMPING ******\n"); 
-  struct _node * n = l->head;
-  while(n!=NULL){
-    printf("==> %s\n",n->data);
-    n=n->next;
-  }
+    struct _node * n = l->head;
+    while(n!=NULL){
+        printf("==> %s\n",n->data);
+        n=n->next;
+    }
 }
 
 
@@ -180,53 +182,15 @@ int list_contains(list * l, char * elem){
     return ret;
 }
 
-void slide_search(list * openset, list *closedset, char * goal){
-
-   //Generic search :
-   //pop last element and add the successors
-   struct _node * candidate = list_remove_last(openset);
-   if(0==strcmp(goal,candidate->data)){
-       //We found a goal !
-       //return the complete path to get there !
-       printf("REACHED GOAL\n");
-       return;
-   }
-
-   
-   list_add_element(closedset,candidate->data);
-
-   list * l = slide_successors(candidate->data);
-
-
-
+void slide_search(char * start, char * goal, list *(*successors)(char *)){
 }
 
 int main ()
 {
 
-  list *openset=(list*)malloc(sizeof(list));
-  list *closedset=(list*)malloc(sizeof(list));
-  
-  
-  list_init(openset);
-  list_init(closedset);
+    //launch a search 
+    slide_search("120345678","012345678", slide_successors);
 
-  list_add_element(openset,"hello");
-  list_add_element(openset,"world");
-  list_add_element(openset,"again");
-
-  printf("contains hello : %d\n",list_contains(openset,"hello"));
-  printf("contains again : %d\n",list_contains(openset,"again"));
-  printf("contains GOGO : %d\n",list_contains(openset,"GOGO"));
-
-
-
-
-  list_add_element(openset,"102345678");
-
-  //launch a search 
-  slide_search(openset,closedset,"012345678");
-  
-  return 0;
+    return 0;
 }
- 
+
