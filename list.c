@@ -47,6 +47,11 @@ list * list_init(int sz)
     return l;
 }
 
+int list_is_empty(list *l)
+{
+    return ((l->head) == NULL);
+}
+
 /**
  * 
  * Add an element at the end of the list (list must NOT be null)
@@ -251,6 +256,16 @@ int main ()
     list_dump(path2,charstar_format);
 
     list_dump_int(list_int);
+
+
+    //get the lists from path and display
+    printf("******** getting back lists *******\n");
+    while(!list_is_empty(paths)){
+        list * l = (list*)(list_remove_last(paths)->data);
+        list_dump(l,charstar_format);
+    }
+    
+    
 
 
 
