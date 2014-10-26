@@ -218,11 +218,21 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
 int main ()
 {
 
+    int a = 1975;
+    int b = 15;
+    int c = 2;
     //make a list of ints
+    list *list_int = list_init(sizeof(int));
+    list_add_element(list_int,&a);
+    list_add_element(list_int,&b);
+    list_add_element(list_int,&c);
+
+    //list of chars
     list *path1 = list_init(sizeof(char*));
     list *path2 = list_init(sizeof(char*));
 
 
+    //list of lists
     list * paths = list_init(sizeof(list*));
 
     list_add_element(path1,"012345678");
@@ -236,7 +246,11 @@ int main ()
     list_add_element(paths,path1);
     list_add_element(paths,path2);
 
+
     list_dump(path1,charstar_format);
+    list_dump(path2,charstar_format);
+
+    list_dump_int(list_int);
 
 
 
