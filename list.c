@@ -58,7 +58,7 @@ int list_is_empty(list *l)
  * 
  */
 
-void list_add_element(list * l,unsigned char * element)
+void list_add_element(list * l,void * element)
 {
     struct _node  *n = (struct _node*)(&(l->head));
     struct _node * new_node = (struct _node*)malloc(sizeof(struct _node));
@@ -85,7 +85,8 @@ void list_add_element(list * l,unsigned char * element)
  * 
  */
 
-struct _node * list_remove_last(list * l)
+
+struct _node * list_last_node(list * l)
 {
 
     struct _node ** address_ptr = &(l->head);
@@ -108,6 +109,10 @@ struct _node * list_remove_last(list * l)
     return ret;
 }
 
+void * list_pop_last_element(list * l){
+    struct _node * node = list_last_node(l);
+    return node->data;
+}
 
 /**
  * 
@@ -178,8 +183,7 @@ void slide_dump(char * position)
 list * slide_successors(char * position)
 {
 
-    list * l = (list*)malloc(sizeof(list));
-    list_init(l);
+    list * l = list_init(sizeof(list));
 
     //find the position of 0 
     int i,index = 0;
@@ -218,6 +222,42 @@ int list_contains(list * l, char * elem){
 }
 
 void slide_search(char * start, char * goal, list *(*successors)(char *)){
+
+    list * closed_set = list_init(sizeof(char*));
+    list * open_set = list_init(sizeof(list*));
+    list * path = list_init(sizeof(char*));
+
+
+    list_add_element(path,start);
+    list_add_element(open_set,path);
+
+    //list * candidate_path = (list*)list_pop_last_element(open_set);
+    list * candidate_path  = (list*)(list_last_node(open_set)->data);
+    printf("dumping candidate\n");
+    list_dump(candidate_path,charstar_format);
+    char * last_state = (char*)list_pop_last_element(candidate_path);
+    printf("last state %s\n",last_state);
+    
+    if(strcmp(last_state,goal)==0)
+    {
+        printf("C'est BON :))))))\n");
+        return;
+    }
+
+    list * game_successors = slide_successors(last_state);
+
+    while(!list_is_empty(game_successors)){
+        char * next_one = list_pop_last_element(game_successors);
+        printf("next one : %s\n",next_one);
+        list_add_element(candidate_path,next_one);
+    }
+    printf("Candidate Path :\n");
+    
+    list_dump(candidate_path,charstar_format);
+    //store the path in the open_set
+    list_add_element(open_set,candidate_path);
+
+
 }
 
 int main ()
@@ -261,13 +301,14 @@ int main ()
     //get the lists from path and display
     printf("******** getting back lists *******\n");
     while(!list_is_empty(paths)){
-        list * l = (list*)(list_remove_last(paths)->data);
+        list * l = (list*)(list_last_node(paths)->data);
         list_dump(l,charstar_format);
     }
     
     
 
 
+    slide_search("102345678","012345678",slide_successors);
 
     return 0;
 }
