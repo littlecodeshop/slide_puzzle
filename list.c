@@ -136,13 +136,14 @@ void * list_last_element(list *l){
  * 
  */
 
-void list_remove_first(list * l)
+struct _node * list_remove_first(list * l)
 {
     struct _node * ptr_node = l->head;
     if(l->head !=NULL){
         l->head = l->head->next; 
         free(ptr_node);
     }
+    return ptr_node;
 }
 
 /**
@@ -159,20 +160,9 @@ char * charstar_format(struct _node * n)
 
 void list_dump(list * l,char * (*format)(struct _node *))
 {
-    printf("***** DUMPING GENERIC ******\n"); 
     struct _node * n = l->head;
     while(n!=NULL){
         printf("==> %s\n",format(n));
-        n=n->next;
-    }
-}
-
-void list_dump_int(list * l)
-{
-    printf("***** DUMPING INTS ******\n"); 
-    struct _node * n = l->head;
-    while(n!=NULL){
-        printf("==> %d\n",*((int*)(n->data)));
         n=n->next;
     }
 }
@@ -189,6 +179,26 @@ void slide_dump(char * position)
     }
 
 }
+
+void list_dump_slide(list * l)
+{
+    struct _node * n = l->head;
+    while(n!=NULL){
+        slide_dump(n->data);
+        printf("\n");
+        n=n->next;
+    }
+}
+void list_dump_int(list * l)
+{
+    printf("***** DUMPING INTS ******\n"); 
+    struct _node * n = l->head;
+    while(n!=NULL){
+        printf("==> %d\n",*((int*)(n->data)));
+        n=n->next;
+    }
+}
+
 
 /**
  * Generates a list containing the list of successors
@@ -208,29 +218,28 @@ list * slide_successors(char * position)
 
     //index a la position 
     int cnt = possible_moves[index][0];
-    printf("CNT : %d\n",cnt);
     for(i = 1;i<=cnt;i++){
-        printf("MOVE %d\n",possible_moves[index][i]);
         int spot = possible_moves[index][i];
         char * new_position = strdup(position);
         //je swappe la position vide avec le spot
         new_position[index] = new_position[spot];
         new_position[spot] = '0'; 
         list_add_element(l,new_position);
-        slide_dump(new_position);
     }
 
     return l;
 }
 
-int list_contains(list * l, char * elem){
+int list_contains(list * l, void * elem){
 
     int ret = 0; 
     struct _node * n = l->head;
 
     while(n!=NULL){
-        if(strcmp(elem,n->data)==0)
+        
+        if(strcmp(elem,n->data)==0){
             return 1;
+        }
         n=n->next;
     }
     return ret;
@@ -251,7 +260,7 @@ list* list_copy(list *l){
 
 void slide_search(char * start, char * goal, list *(*successors)(char *)){
 
-    
+    char c;
     list * closed_set = list_init();
     list * open_set = list_init();
     list * path = list_init();
@@ -260,88 +269,48 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
     list_add_element(path,start);
     list_add_element(open_set,path);
 
-    //list * candidate_path = (list*)list_pop_last_element(open_set);
-    list * candidate_path  = (list*)(list_last_node(open_set)->data);
-    list_dump(candidate_path,charstar_format);
-    char * last_state = (char*)list_last_element(candidate_path);
-    
-    if(strcmp(last_state,goal)==0)
-    {
-        printf("C'est BON :))))))\n");
-        return;
+    while(1){ //do until the end ?? what is the end ??
+
+
+        //list * candidate_path  = (list*)(list_last_node(open_set)->data);
+        list * candidate_path  = (list*)(list_remove_first(open_set)->data);
+        char * last_state = (char*)list_last_element(candidate_path);
+        list_add_element(closed_set,last_state);
+        list_dump(closed_set,charstar_format);
+
+        if(strcmp(last_state,goal)==0)
+        {
+            printf("FOUND :) !!!\n");
+            list_dump_slide(candidate_path);
+            return;
+        }
+
+        list * game_successors = slide_successors(last_state);
+
+        //create the new candidate paths
+        while(!list_is_empty(game_successors)){
+            //create a new list
+
+            list * new_path = list_copy(candidate_path);
+            char * next_one = list_pop_last_element(game_successors);
+            if(!list_contains(closed_set,next_one)){
+                if(strcmp(next_one,"012345678")==0)
+                    printf("ADDING A SOLUTION");
+                list_add_element(new_path,next_one);
+                list_add_element(open_set,new_path);
+                //list_dump_slide(new_path);
+            }
+
+        }
+
     }
-
-    list * game_successors = slide_successors(last_state);
-
-    while(!list_is_empty(game_successors)){
-        //create a new list
-        list * new_path = list_copy(candidate_path);
-        char * next_one = list_pop_last_element(game_successors);
-        printf("next one : %s\n",next_one);
-        //list_add_element(new_path,last_state);
-        list_add_element(new_path,next_one);
-        printf("New PATH : \n");
-        list_dump(new_path,charstar_format);
-        
-    }
-    printf("Candidate Path :\n");
-    
-    list_dump(candidate_path,charstar_format);
-    //store the path in the open_set
-    list_add_element(open_set,candidate_path);
-
-
 }
 
 int main ()
 {
 
-    int a = 1975;
-    int b = 15;
-    int c = 2;
-    //make a list of ints
-    list *list_int = list_init();
-    list_add_element(list_int,&a);
-    list_add_element(list_int,&b);
-    list_add_element(list_int,&c);
 
-    //list of chars
-    list *path1 = list_init();
-    list *path2 = list_init();
-
-
-    //list of lists
-    list * paths = list_init();
-
-    list_add_element(path1,"012345678");
-    list_add_element(path1,"102345678");
-    list_add_element(path1,"120345678");
-
-    list_add_element(path2,"ABCDEFGHI");
-    list_add_element(path2,"BACDEFGHI");
-    list_add_element(path2,"CABDEFGHI");
-    
-    list_add_element(paths,path1);
-    list_add_element(paths,path2);
-
-
-    list_dump(path1,charstar_format);
-    list_dump(path2,charstar_format);
-
-    list_dump_int(list_int);
-
-
-    //get the lists from path and display
-    printf("******** getting back lists *******\n");
-    while(!list_is_empty(paths)){
-        list * l = (list*)(list_last_node(paths)->data);
-        list_dump(l,charstar_format);
-    }
-    
-    
-
-
-    slide_search("102345678","012345678",slide_successors);
+    slide_search("740132685","012345678",slide_successors);
 
     return 0;
 }
