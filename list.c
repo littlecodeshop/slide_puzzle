@@ -36,14 +36,12 @@ struct _node
 typedef struct _list
 {
     struct _node * head;    //pointer to first element
-    int sz;                 //size of an element in bytes
 } list;
 
-list * list_init(int sz)
+list * list_init()
 {
     list * l = (list *)malloc(sizeof(list));
     l->head = NULL;
-    l->sz = sz;
     return l;
 }
 
@@ -73,6 +71,8 @@ void list_add_element(list * l,void * element)
 
     n->next = new_node;
 }
+
+
 
 /**
  * 
@@ -109,6 +109,27 @@ void * list_pop_last_element(list * l){
     return node->data;
 }
 
+void * list_last_element(list *l){
+    struct _node ** address_ptr = &(l->head);
+    struct _node ** address_previous = NULL;
+
+    struct _node * ret= NULL;
+
+    while((*address_ptr)!=NULL){
+        address_previous = address_ptr;
+        address_ptr = &((*address_ptr)->next);
+    }
+
+    if(address_previous!=NULL){
+
+        ret = *address_previous;
+    }
+
+
+
+    return ((struct _node*)ret)->data;
+
+}
 /**
  * 
  *  Remove the first element from a list
@@ -151,7 +172,6 @@ void list_dump_int(list * l)
     printf("***** DUMPING INTS ******\n"); 
     struct _node * n = l->head;
     while(n!=NULL){
-        int dt = 
         printf("==> %d\n",*((int*)(n->data)));
         n=n->next;
     }
@@ -178,7 +198,7 @@ void slide_dump(char * position)
 list * slide_successors(char * position)
 {
 
-    list * l = list_init(sizeof(list));
+    list * l = list_init();
 
     //find the position of 0 
     int i,index = 0;
@@ -216,13 +236,25 @@ int list_contains(list * l, char * elem){
     return ret;
 }
 
+list* list_copy(list *l){
+    list *tmp = list_init();
+    struct _node * n = l->head;
+
+    while(n!=NULL){
+        list_add_element(tmp,n->data);
+        n=n->next;
+    }
+
+    return tmp;
+
+}
+
 void slide_search(char * start, char * goal, list *(*successors)(char *)){
 
-    printf("WILL SEARCH %s\n",start);
     
-    list * closed_set = list_init(sizeof(char*));
-    list * open_set = list_init(sizeof(list*));
-    list * path = list_init(sizeof(char*));
+    list * closed_set = list_init();
+    list * open_set = list_init();
+    list * path = list_init();
 
 
     list_add_element(path,start);
@@ -230,10 +262,8 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
 
     //list * candidate_path = (list*)list_pop_last_element(open_set);
     list * candidate_path  = (list*)(list_last_node(open_set)->data);
-    printf("dumping candidate\n");
     list_dump(candidate_path,charstar_format);
-    char * last_state = (char*)list_pop_last_element(candidate_path);
-    printf("last state %s\n",last_state);
+    char * last_state = (char*)list_last_element(candidate_path);
     
     if(strcmp(last_state,goal)==0)
     {
@@ -244,9 +274,15 @@ void slide_search(char * start, char * goal, list *(*successors)(char *)){
     list * game_successors = slide_successors(last_state);
 
     while(!list_is_empty(game_successors)){
+        //create a new list
+        list * new_path = list_copy(candidate_path);
         char * next_one = list_pop_last_element(game_successors);
         printf("next one : %s\n",next_one);
-        list_add_element(candidate_path,next_one);
+        //list_add_element(new_path,last_state);
+        list_add_element(new_path,next_one);
+        printf("New PATH : \n");
+        list_dump(new_path,charstar_format);
+        
     }
     printf("Candidate Path :\n");
     
@@ -264,18 +300,18 @@ int main ()
     int b = 15;
     int c = 2;
     //make a list of ints
-    list *list_int = list_init(sizeof(int));
+    list *list_int = list_init();
     list_add_element(list_int,&a);
     list_add_element(list_int,&b);
     list_add_element(list_int,&c);
 
     //list of chars
-    list *path1 = list_init(sizeof(char*));
-    list *path2 = list_init(sizeof(char*));
+    list *path1 = list_init();
+    list *path2 = list_init();
 
 
     //list of lists
-    list * paths = list_init(sizeof(list*));
+    list * paths = list_init();
 
     list_add_element(path1,"012345678");
     list_add_element(path1,"102345678");
