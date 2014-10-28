@@ -63,12 +63,7 @@ void list_add_element(list * l,void * element)
     struct _node  *n = (struct _node*)(&(l->head));
     struct _node * new_node = (struct _node*)malloc(sizeof(struct _node));
     
-    
-    new_node->data = malloc(l->sz); //on doit copier la memoire 
-    //copy the memory from element into data
-    memcpy(new_node->data,element,l->sz);
-
-    
+    new_node->data = element;
     new_node->next = NULL;
 
 
@@ -223,6 +218,8 @@ int list_contains(list * l, char * elem){
 
 void slide_search(char * start, char * goal, list *(*successors)(char *)){
 
+    printf("WILL SEARCH %s\n",start);
+    
     list * closed_set = list_init(sizeof(char*));
     list * open_set = list_init(sizeof(list*));
     list * path = list_init(sizeof(char*));
